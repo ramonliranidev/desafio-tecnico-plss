@@ -20,6 +20,11 @@ export const registerSchema = z.object({
     .min(3, 'Username deve ter pelo menos 3 caracteres')
     .max(20, 'Username deve ter no máximo 20 caracteres')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username pode conter apenas letras, números e underscore'),
+  team_favorite: z
+    .string()
+    .min(1, 'Time favorito é obrigatório')
+    .min(3, 'Time favorito deve ter pelo menos 3 caracteres')
+    .max(20, 'Time favorito deve ter no máximo 20 caracteres'),
   email: z
     .string()
     .min(1, 'Email é obrigatório')

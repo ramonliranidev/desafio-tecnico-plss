@@ -3,9 +3,12 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginFormData, loginSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import logo from '../utils/plsslogo.png';
 
 export default function LoginForm() {
   const [error, setError] = useState<string>('');
@@ -27,9 +30,12 @@ export default function LoginForm() {
 
     try {
       await login(data);
+      toast.success('Login realizado com sucesso!');
       router.push('/dashboard'); // Redireciona para o dashboard após login
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = err.message || 'Erro ao fazer login';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -38,6 +44,16 @@ export default function LoginForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        <Image
+          className="mx-auto h-12 w-auto"
+          src={logo}
+          alt="PLSS Logo" 
+          width={200}
+          height={200}
+        />
+        <h1 className='text-center text-4xl font-extrabold text-gray-900'>
+          Teste Técnico - PLSS
+        </h1>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Faça login na sua conta

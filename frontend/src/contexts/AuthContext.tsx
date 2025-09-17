@@ -2,7 +2,8 @@
 
 import { authAPI, LoginData, RegisterData, User } from '@/lib/api';
 import Cookies from 'js-cookie';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
   user: User | null;
@@ -18,18 +19,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   const isAuthenticated = !!user;
 
+  // Garantir que está montado no cliente antes de acessar cookies
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Verificar se há token salvo e obter dados do usuário
   useEffect(() => {
+    if (!mounted) return;
+    
     const token = Cookies.get('access_token');
     if (token) {
       loadUser();
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [mounted]);
 
   const loadUser = async () => {
     try {
@@ -77,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     authAPI.logout();
     setUser(null);
+    toast.info('Você foi desconectado com sucesso');
   };
 
   const value = {
@@ -88,6 +98,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated,
   };
 
+  // Evitar problemas de hidratação não renderizando até estar montado
+  if (!mounted) {
+    return (
+      <AuthContext.Provider value={{ ...value, loading: true }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+
   return (
     <AuthContext.Provider value={value}>
       {children}
@@ -98,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 }

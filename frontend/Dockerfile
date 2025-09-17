@@ -1,52 +1,51 @@
-# Stage 1: Dependencies
-FROM node:18-alpine AS deps
-WORKDIR /app
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
 
-# Copy package files
-COPY package.json ./
+FROM node:18-alpine As development
 
-# Install dependencies (npm install para gerar package-lock.json)
-RUN npm install --omit=dev
+WORKDIR /recordar/frontend
 
-# Stage 2: Builder
-FROM node:18-alpine AS builder
-WORKDIR /app
+COPY --chown=node:node package*.json ./
 
-# Copy package files
-COPY package.json ./
 RUN npm install
 
-# Copy source code
-COPY . .
+COPY --chown=node:node . .
 
-# Set environment variables for build
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+USER node
 
-# Build the app
+###################
+# BUILD FOR PRODUCTION
+###################
+
+FROM node:18-alpine As build
+
+WORKDIR /recordar/frontend
+
+COPY --chown=node:node package*.json ./
+
+COPY --chown=node:node --from=development /recordar/frontend/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
 RUN npm run build
 
-# Stage 3: Runner
-FROM node:18-alpine AS runner
-WORKDIR /app
+ENV NODE_ENV prod
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Create nextjs user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+USER node
 
-# Copy built application
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+###################
+# PRODUCTION
+###################
 
-USER nextjs
+FROM node:18-alpine As production
 
-EXPOSE 3000
+COPY --chown=node:node --from=build /recordar/frontend/package.json ./package.json
+COPY --chown=node:node --from=build /recordar/frontend/node_modules ./node_modules
+COPY --chown=node:node --from=build /recordar/frontend/public ./public
+COPY --chown=node:node --from=build /recordar/frontend/.next ./.next
+COPY --chown=node:node --from=build /recordar/frontend/.env ./.env
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["node", "server.js"]
+CMD [ "npm", "run", "start"]

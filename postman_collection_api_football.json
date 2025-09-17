@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Football-data.org API v4",
+    "description": "Collection para testar a API externa football-data.org",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "api_url",
+      "value": "https://api.football-data.org/v4",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "YOUR_API_KEY_HERE",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Auth-Token"
+      },
+      {
+        "key": "value",
+        "value": "{{api_key}}"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Brasileirão - Times",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/competitions/BSA/teams",
+          "host": ["{{api_url}}"],
+          "path": ["competitions", "BSA", "teams"]
+        }
+      }
+    },
+    {
+      "name": "Brasileirão - Classificação",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/competitions/BSA/standings",
+          "host": ["{{api_url}}"],
+          "path": ["competitions", "BSA", "standings"]
+        }
+      }
+    },
+    {
+      "name": "Time Específico - Flamengo",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/teams/1776",
+          "host": ["{{api_url}}"],
+          "path": ["teams", "1776"]
+        }
+      }
+    },
+    {
+      "name": "Partidas de um Time",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/teams/1776/matches",
+          "host": ["{{api_url}}"],
+          "path": ["teams", "1776", "matches"]
+        }
+      }
+    }
+  ]
+}

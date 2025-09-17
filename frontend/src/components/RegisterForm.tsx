@@ -4,8 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { RegisterFormData, registerSchema } from '@/lib/validations';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 export default function RegisterForm() {
   const [error, setError] = useState<string>('');
@@ -29,9 +30,12 @@ export default function RegisterForm() {
       // Remove confirmPassword antes de enviar para a API
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
+      toast.success('Conta criada com sucesso! Bem-vindo!');
       router.push('/dashboard'); // Redireciona para o dashboard após registro
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = err.message || 'Erro ao criar conta';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -78,6 +82,23 @@ export default function RegisterForm() {
               />
               {errors.username && (
                 <p className="form-error">{errors.username.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="team_favorite" className="block text-sm font-medium text-gray-700">
+                Time De Futebol Favorito
+                </label>
+              <input
+                {...register('team_favorite')}
+                type="text"
+                id="team_favorite"
+                autoComplete="team_favorite"
+                className="form-input"  
+                placeholder="Digite o nome do time favorito"
+              />
+              {errors.team_favorite && (
+                <p className="form-error">{errors.team_favorite.message}</p>
               )}
             </div>
 

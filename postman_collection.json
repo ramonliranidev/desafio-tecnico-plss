@@ -1,0 +1,319 @@
+{
+  "info": {
+    "name": "Desafio Técnico PLSS - API Completa",
+    "description": "Collection completa para testar a API do Sistema de Times de Futebol",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string",
+      "description": "URL base da API"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string",
+      "description": "Token JWT para autenticação"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticação",
+      "item": [
+        {
+          "name": "1. Registrar Usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teste123\",\n  \"email\": \"teste@email.com\",\n  \"password\": \"minhasenha123\",\n  \"team_favorite\": \"Flamengo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/signup",
+              "host": ["{{base_url}}"],
+              "path": ["users", "signup"]
+            },
+            "description": "Registra um novo usuário com time favorito"
+          }
+        },
+        {
+          "name": "2. Login (Obter Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teste123\",\n  \"password\": \"minhasenha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["users", "login"]
+            },
+            "description": "Faz login e retorna o token JWT"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Salva automaticamente o token na variável",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "    console.log('✅ Token salvo automaticamente!');",
+                  "    console.log('Token:', response.access_token);",
+                  "} else {",
+                  "    console.log('❌ Erro no login:', pm.response.json());",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Meu Perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["users", "me"]
+            },
+            "description": "Retorna dados do usuário logado (requer token)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚽ Times",
+      "item": [
+        {
+          "name": "1. Listar Times do Brasileirão",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/teams/brasileirao",
+              "host": ["{{base_url}}"],
+              "path": ["teams", "brasileirao"]
+            },
+            "description": "Lista todos os times do Campeonato Brasileiro"
+          }
+        },
+        {
+          "name": "2. Detalhes de um Time",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/teams/1776",
+              "host": ["{{base_url}}"],
+              "path": ["teams", "1776"]
+            },
+            "description": "Retorna detalhes completos de um time específico (substitua 1776 pelo ID desejado)"
+          }
+        },
+        {
+          "name": "3. Partidas de um Time",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/teams/1776/matches",
+              "host": ["{{base_url}}"],
+              "path": ["teams", "1776", "matches"]
+            },
+            "description": "Lista as partidas de um time específico"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Sistema e Estatísticas",
+      "item": [
+        {
+          "name": "1. Indicadores de Times",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/indicadores",
+              "host": ["{{base_url}}"],
+              "path": ["indicadores"]
+            },
+            "description": "Retorna estatísticas e indicadores dos times (mais antigo, distribuição por década, etc.)"
+          }
+        },
+        {
+          "name": "2. Importar Dados Frescos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/importar",
+              "host": ["{{base_url}}"],
+              "path": ["importar"]
+            },
+            "description": "Força importação de dados frescos da API football-data.org"
+          }
+        },
+        {
+          "name": "3. Status da API",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["status"]
+            },
+            "description": "Verifica se a API está online (endpoint público)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Usuários (Administrativo)",
+      "item": [
+        {
+          "name": "1. Listar Todos os Usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/all",
+              "host": ["{{base_url}}"],
+              "path": ["users", "all"]
+            },
+            "description": "Lista todos os usuários (endpoint administrativo)"
+          }
+        },
+        {
+          "name": "2. Deletar Usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["users", "1"]
+            },
+            "description": "Deleta um usuário pelo ID (substitua 1 pelo ID desejado)"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script executado antes de cada requisição",
+          "console.log('🚀 Executando requisição para:', pm.request.url);",
+          "",
+          "// Verifica se o token está presente para endpoints protegidos",
+          "const token = pm.collectionVariables.get('access_token');",
+          "const url = pm.request.url.toString();",
+          "",
+          "if (!token && !url.includes('/login') && !url.includes('/signup') && !url.includes('/status')) {",
+          "    console.log('⚠️ Token não encontrado! Execute o login primeiro.');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Script executado após cada resposta",
+          "console.log('📊 Status da resposta:', pm.response.code);",
+          "",
+          "// Verifica se a resposta foi bem-sucedida",
+          "if (pm.response.code >= 200 && pm.response.code < 300) {",
+          "    console.log('✅ Requisição bem-sucedida!');",
+          "} else if (pm.response.code === 401) {",
+          "    console.log('🔒 Token inválido ou expirado. Faça login novamente.');",
+          "} else if (pm.response.code >= 400) {",
+          "    console.log('❌ Erro na requisição:', pm.response.json());",
+          "}"
+        ]
+      }
+    }
+  ]
+}
