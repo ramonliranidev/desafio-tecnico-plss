@@ -1,6 +1,7 @@
 'use client';
 
-import { authAPI, LoginData, RegisterData, User } from '@/lib/api';
+import { authAPI } from '@/lib/api';
+import { LoginData, RegisterData, User } from '@/models/api.models';
 import Cookies from 'js-cookie';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -86,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     authAPI.logout();
     setUser(null);
-    toast.info('Você foi desconectado com sucesso');
+    toast.info('Você foi desconectado');
   };
 
   const value = {
