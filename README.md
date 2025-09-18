@@ -16,7 +16,7 @@ Sistema completo para visualização de times do Brasileirão com autenticação
 - **TypeScript** - Tipagem estática
 - **Tailwind CSS** - Estilização eficiente
 - **React Hook Form** - Gerenciamento de formulários
-- **React Toastify** - Notificações elegantes
+- **React Toastify** - Notificações visuais
 
 ## 📋 Funcionalidades
 
@@ -237,5 +237,6 @@ desafio tecnico plss/
 Este projeto está sob a licença MIT ou seja autorizado para alterações.
 
 ---
+
 
 **Desenvolvido para o Desafio Técnico PLSS** 🚀
