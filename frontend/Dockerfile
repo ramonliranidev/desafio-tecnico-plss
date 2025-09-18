@@ -4,7 +4,7 @@
 
 FROM node:18-alpine As development
 
-WORKDIR /recordar/frontend
+WORKDIR /app
 
 COPY --chown=node:node package*.json ./
 
@@ -20,17 +20,17 @@ USER node
 
 FROM node:18-alpine As build
 
-WORKDIR /recordar/frontend
+WORKDIR /app
 
 COPY --chown=node:node package*.json ./
 
-COPY --chown=node:node --from=development /recordar/frontend/node_modules ./node_modules
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
 
 COPY --chown=node:node . .
 
 RUN npm run build
 
-ENV NODE_ENV prod
+ENV NODE_ENV=production
 
 RUN npm ci --omit=dev && npm cache clean --force
 
@@ -42,10 +42,15 @@ USER node
 
 FROM node:18-alpine As production
 
-COPY --chown=node:node --from=build /recordar/frontend/package.json ./package.json
-COPY --chown=node:node --from=build /recordar/frontend/node_modules ./node_modules
-COPY --chown=node:node --from=build /recordar/frontend/public ./public
-COPY --chown=node:node --from=build /recordar/frontend/.next ./.next
-COPY --chown=node:node --from=build /recordar/frontend/.env ./.env
+WORKDIR /app
 
-CMD [ "npm", "run", "start"]
+COPY --chown=node:node --from=build /app/package.json ./package.json
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/public ./public
+COPY --chown=node:node --from=build /app/.next ./.next
+
+# Expor a porta
+EXPOSE 3000
+
+# Comando para produção
+CMD ["npm", "run", "start"]

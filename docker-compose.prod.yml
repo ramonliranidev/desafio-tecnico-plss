@@ -1,50 +1,49 @@
 version: "3.9"
 
 services:
-   backend:
-      build:
-         context: ./backend
-         target: production
-      container_name: fastapi_backend
-      ports:
-         - "8000:8000"
-      environment:
-         - DATABASE_URL=postgresql://root:root@db:5432/mydatabase
-      depends_on:
-         - db
+  backend:
+    build:
+      context: ./backend
+      target: production
+    container_name: fastapi_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://root:root@db:5432/mydatabase
+    depends_on:
+      db:
+        condition: service_healthy
 
-   db:
-      image: postgres:15
-      container_name: postgres_db
-      restart: always
-      environment:
-         POSTGRES_USER: root
-         POSTGRES_PASSWORD: root
-         POSTGRES_DB: mydatabase
-      ports:
-         - "5432:5432"
-      volumes:
-         - postgres_data:/var/lib/postgresql/data
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-   frontend:
-      build:
-         context: ./frontend
-         target: production
-      container_name: frontend_app
-      ports:
-         - "3000:3000"
-      environment:
-         - NEXT_PUBLIC_API_BASE_URL=http://backend:8000
-         - NODE_ENV=development
-         - WATCHPACK_POLLING=true
-      volumes:
-         - ./frontend:/app
-         - /app/node_modules
-         - /app/.next
-      stdin_open: true
-      tty: true
-      depends_on:
-         - backend
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    container_name: frontend_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+      - NODE_ENV=production
+    depends_on:
+      - backend
 
 volumes:
-   postgres_data:
+  postgres_data:
