@@ -30,8 +30,8 @@ export default function RegisterForm() {
       // Remove confirmPassword antes de enviar para a API
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
-      toast.success('Conta criada com sucesso! Bem-vindo!');
-      router.push('/dashboard'); // Redireciona para o dashboard após registro
+      toast.success('Conta criada com sucesso! Faça login para acessar o sistema.');
+      router.push('/login'); // Redireciona para o login após registro
     } catch (err: any) {
       const errorMessage = err.message || 'Erro ao criar conta';
       setError(errorMessage);
